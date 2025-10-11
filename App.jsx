@@ -1,4 +1,4 @@
-import React from 'react';
+const React = window.React;
 
 // Gerekli kütüphaneleri yüklemek için script etiketleri ekliyoruz.
 const papaParseScript = document.createElement('script');
