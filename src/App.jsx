@@ -1,38 +1,5 @@
 import React from 'react';
 
-// Gerekli kütüphaneleri yüklemek için script etiketleri ekliyoruz.
-const papaParseScript = document.createElement('script');
-papaParseScript.src = "https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js";
-papaParseScript.async = true;
-document.head.appendChild(papaParseScript);
-
-const sheetJsScript = document.createElement('script');
-sheetJsScript.src = "https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";
-sheetJsScript.async = true;
-document.head.appendChild(sheetJsScript);
-
-const jsBarcodeScript = document.createElement('script');
-jsBarcodeScript.src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js";
-jsBarcodeScript.async = true;
-document.head.appendChild(jsBarcodeScript);
-
-const jsPdfScript = document.createElement('script');
-jsPdfScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-jsPdfScript.async = true;
-document.head.appendChild(jsPdfScript);
-
-const html2canvasScript = document.createElement('script');
-html2canvasScript.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
-html2canvasScript.async = true;
-document.head.appendChild(html2canvasScript);
-
-// QR Kod için eklendi
-const qrCodeScript = document.createElement('script');
-qrCodeScript.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js";
-qrCodeScript.async = true;
-document.head.appendChild(qrCodeScript);
-
-
 // --- Yardımcı Bileşenler ---
 
 const Barcode = ({ text }) => {
@@ -134,7 +101,8 @@ function App() {
   const [customText, setCustomText] = React.useState("");
 
   const tableHeaders = [ { key: 'barcode', label: 'Barkod' }, { key: 'title', label: 'Başlık' }, { key: 'author', label: 'Yazar' }, { key: 'itemcallnumber', label: 'Yer Numarası' }, { key: 'itemtype', label: 'Materyal Türü' }, { key: 'location', label: 'Bölümü' }];
-  const itemsPerPage = React.useMemo(() => Math.max(1, settings.numCols * settings.numRows), [settings.numCols, settings.rows]);
+  const itemsPerPage = React.useMemo(() => Math.max(1, settings.numCols * settings.numRows), [settings.numCols, settings.numRows]);
+  
   // --- EFFECT'LER ---
   React.useEffect(() => { document.documentElement.classList.toggle('dark', isDarkMode); }, [isDarkMode]);
 
@@ -249,7 +217,7 @@ function App() {
   };
   
   // Diğer Handler'lar...
-  const loadTemplate = (key) => { setSelectedTemplateKey(key); if (key !== 'custom' && key !== 'load_custom') setSettings(templates[key] || templates.custom); };
+  const loadTemplate = (key) => { setSelectedTemplateKey(key); if (key !== 'custom' && key !== 'load_custom') setSettings(templates[key] || customTemplates[key] || templates.custom); };
   const handleSettingChange = (field, value) => { const newSettings = { ...settings, [field]: Number(value) }; setSettings(newSettings); setSelectedTemplateKey('custom'); templates.custom = { ...templates.custom, ...newSettings }; };
   const requestSort = (key) => { setSortConfig(c => ({ key, direction: c.key === key && c.direction === 'ascending' ? 'descending' : 'ascending' })); setCurrentPage(1); };
   const handleSelectPage = () => updateSelection(paginatedData.map(item => item.barcode), true);
@@ -300,7 +268,7 @@ function App() {
         <div className="max-w-screen-2xl mx-auto">
            <header className="mb-8 no-print flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Kitap Barkodu Oluşturucu</h1>
+                    <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Kitap Barkod Oluşturucu</h1>
                     <p className="text-slate-600 dark:text-slate-400 mt-1">Veri yükleyin, barkod seçin ve etiket şablonunuzu oluşturun.</p>
                 </div>
                 <button onClick={() => setIsDarkMode(p => !p)} className="p-2 rounded-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors">
@@ -395,7 +363,7 @@ function App() {
                         <div className="p-2 bg-slate-200 dark:bg-slate-700 rounded-md">
                            <div style={{ transform: 'scale(1.5)', transformOrigin: 'top left', minHeight: `${settings.labelHeight * 1.5 + 10}px`}}>
                                 <div className="border border-dashed border-gray-400 dark:border-gray-500 overflow-hidden box-border bg-white" style={{ width: `${settings.labelWidth}mm`, height: `${settings.labelHeight}mm` }}>
-                                   {renderSingleLabel(labelsToPrint[0], 'preview')}
+                                   {renderSingleLabel(labelsToPrint[0] || {}, 'preview')}
                                 </div>
                            </div>
                         </div>
@@ -444,6 +412,3 @@ function App() {
 }
 
 export default App;
-
-
-
